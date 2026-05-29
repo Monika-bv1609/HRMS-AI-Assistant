@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 import xmlrpc.client
+from datetime import date
+from schemas.hr import HRQuestion
+from agents.hr_agent import process_question
 
 router = APIRouter()
 
@@ -56,3 +59,220 @@ def get_employees():
     )
 
     return employees
+
+
+@router.get("/employees/count")
+def get_employee_count():
+
+    uid, models = get_models()
+
+    total = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.employee",
+
+        "search_count",
+
+        [[]]
+    )
+
+    return {
+
+        "total_employees": total
+    }
+
+
+
+@router.get("/employee/{employee_id}")
+def get_employee(employee_id: int):
+
+    uid, models = get_models()
+
+    employee = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.employee",
+
+        "read",
+
+        [[employee_id]],
+
+        {
+            "fields": [
+                "name",
+                "work_email",
+                "job_title"
+            ]
+        }
+    )
+
+    if not employee:
+
+        return {
+            "message": "Employee not found"
+        }
+
+    return employee[0]
+
+
+@router.get("/employees/search")
+def search_employees(name: str):
+
+    uid, models = get_models()
+
+    employees = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.employee",
+
+        "search_read",
+
+        [
+            [
+                ("name", "ilike", name)
+            ]
+        ],
+
+        {
+            "fields": [
+                "name",
+                "work_email",
+                "job_title"
+            ]
+        }
+    )
+
+    return employees
+
+
+@router.get("/leaves")
+def get_leaves():
+
+    uid, models = get_models()
+
+    leaves = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.leave",
+
+        "search_read",
+
+        [[]],
+
+        {
+            "fields": [
+                "employee_id",
+                "holiday_status_id",
+                "request_date_from",
+                "request_date_to",
+                "state"
+            ]
+        }
+    )
+
+    return leaves
+
+
+@router.get("/leaves/count")
+def get_leave_count():
+
+    uid, models = get_models()
+
+    total = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.leave",
+
+        "search_count",
+
+        [[]]
+    )
+
+    return {
+
+        "total_leaves": total
+    }
+
+
+
+@router.get("/leaves/today")
+def get_leaves_today():
+
+    uid, models = get_models()
+
+    today = str(date.today())
+
+    leaves = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.leave",
+
+        "search_read",
+
+        [[
+
+            ("request_date_from", "<=", today),
+
+            ("request_date_to", ">=", today),
+
+            ("state", "=", "validate")
+
+        ]],
+
+        {
+
+            "fields": [
+
+                "employee_id",
+
+                "holiday_status_id",
+
+                "request_date_from",
+
+                "request_date_to"
+
+            ]
+        }
+    )
+
+    return leaves
+
+
+@router.post("/ask-hr")
+def ask_hr(data: HRQuestion):
+
+    result = process_question(
+        data.question
+    )
+
+    return result
