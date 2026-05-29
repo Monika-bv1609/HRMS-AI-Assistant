@@ -9,7 +9,7 @@ USERNAME = "admin"
 PASSWORD = "admin"
 
 
-def get_odoo_connection():
+def get_models():
 
     common = xmlrpc.client.ServerProxy(
         f"{ODOO_URL}/xmlrpc/2/common"
@@ -22,6 +22,8 @@ def get_odoo_connection():
         {}
     )
 
-    print("UID =", uid)
+    models = xmlrpc.client.ServerProxy(
+        f"{ODOO_URL}/xmlrpc/2/object"
+    )
 
-    return uid
+    return uid, models
