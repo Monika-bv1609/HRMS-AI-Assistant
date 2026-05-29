@@ -1,5 +1,5 @@
-from agents.intent_router import (
-    detect_intent
+from services.llm_service import (
+    classify_intent
 )
 
 from services.odoo_service import (
@@ -14,9 +14,11 @@ from services.odoo_service import (
 
 def process_question(question: str):
 
-    intent = detect_intent(
+    intent = classify_intent(
         question
     )
+
+    print(f"Detected Intent: {intent}")
 
     if intent == "employee_count":
 
