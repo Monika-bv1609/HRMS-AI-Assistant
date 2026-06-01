@@ -18,7 +18,7 @@ def process_question(question: str):
         question
     )
 
-    print(f"Detected Intent: {intent}")
+    print(f"Detected Intent: [intent]")
 
     if intent == "employee_count":
 

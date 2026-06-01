@@ -9,34 +9,64 @@ client = OpenAI(
     base_url="https://api.groq.com/openai/v1"
 )
 
+
 def classify_intent(question):
 
-    prompt = f"""
-Return ONLY one of:
+    response = client.chat.completions.create(
+
+        model="llama-3.1-8b-instant",
+
+        messages=[
+
+            {
+                "role": "system",
+                "content": """
+You are an intent classifier.
+
+Return ONLY one of these exact values:
 
 employee_count
 leave_today
 employee_search
 
-Question:
-{question}
+Rules:
+- Never explain
+- Never generate code
+- Never generate examples
+- Never generate sentences
+- Return only the intent value
 """
+            },
 
-    response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
             {
                 "role": "user",
-                "content": prompt
+                "content": question
             }
+
         ],
+
         temperature=0
     )
 
-    return (
+    intent = (
+
         response
         .choices[0]
         .message
         .content
         .strip()
+        .lower()
     )
+
+    print(f"RAW LLM RESPONSE: [{intent}]")
+
+    if "employee_search" in intent:
+        return "employee_search"
+
+    if "employee_count" in intent:
+        return "employee_count"
+
+    if "leave_today" in intent:
+        return "leave_today"
+
+    return "unknown"
