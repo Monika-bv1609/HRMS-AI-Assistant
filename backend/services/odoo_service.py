@@ -68,3 +68,34 @@ def search_employee(name):
             ]
         }
     )
+
+
+def get_leave_count_today():
+
+    leaves = get_leaves_today()
+
+    return len(leaves)
+
+
+
+def is_employee_on_leave_today(
+    employee_name
+):
+
+    leaves = get_leaves_today()
+
+    for leave in leaves:
+
+        employee = leave[
+            "employee_id"
+        ][1]
+
+        if (
+            employee.lower()
+            ==
+            employee_name.lower()
+        ):
+
+            return True
+
+    return False

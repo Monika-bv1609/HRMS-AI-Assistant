@@ -21,21 +21,42 @@ def classify_intent(question):
             {
                 "role": "system",
                 "content": """
-You are an intent classifier.
+            You are an intent classifier.
 
-Return ONLY one of these exact values:
+            Return ONLY one of:
 
-employee_count
-leave_today
-employee_search
+            employee_count
+            employee_search
+            leave_today
+            leave_count
+            leave_status
 
-Rules:
-- Never explain
-- Never generate code
-- Never generate examples
-- Never generate sentences
-- Return only the intent value
-"""
+            Examples:
+
+            How many employees are there?
+            -> employee_count
+
+            Find employee Mitchell
+            -> employee_search
+
+            Who is on leave today?
+            -> leave_today
+
+            How many employees are on leave today?
+            -> leave_count
+
+            Is Mitchell on leave today?
+            -> leave_status
+
+            Is he on leave today?
+            -> leave_status
+
+            Rules:
+            - Return only the intent
+            - No explanation
+            - No JSON
+            - No code
+            """
             },
 
             {
@@ -58,7 +79,9 @@ Rules:
         .lower()
     )
 
-    print(f"RAW LLM RESPONSE: [{intent}]")
+    print(
+        f"RAW LLM RESPONSE: [{intent}]"
+    )
 
     if "employee_search" in intent:
         return "employee_search"
@@ -68,5 +91,11 @@ Rules:
 
     if "leave_today" in intent:
         return "leave_today"
+
+    if "leave_count" in intent:
+        return "leave_count"
+
+    if "leave_status" in intent:
+        return "leave_status"
 
     return "unknown"

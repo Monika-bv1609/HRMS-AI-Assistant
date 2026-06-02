@@ -23,6 +23,15 @@ from services.odoo_service import (
     search_employee
 )
 
+from services.leave_entity_extractor import (
+    extract_leave_entity
+)
+
+from services.odoo_service import (
+    get_leave_count_today,
+    is_employee_on_leave_today
+)
+
 
 def process_question(question: str):
 
@@ -151,6 +160,65 @@ def process_question(question: str):
 
             "answer":
             f"{employee['name']} | {employee.get('job_title')} | {employee.get('work_email')}"
+        }
+    
+
+
+    if intent == "leave_count":
+
+        total = get_leave_count_today()
+
+        return {
+
+            "answer":
+            f"{total} employees are on leave today."
+        }
+
+
+    if intent == "leave_status":
+
+        entity = extract_leave_entity(
+            question
+        )
+
+        employee_name = entity.get(
+            "employee_name"
+        )
+
+        if not employee_name:
+
+            employee_name = (
+                memory_store.get(
+                    "employee_name"
+                )
+            )
+
+        if not employee_name:
+
+            return {
+
+                "answer":
+                "Unable to identify employee."
+            }
+
+        on_leave = (
+            is_employee_on_leave_today(
+                employee_name
+            )
+        )
+
+        if on_leave:
+
+            return {
+
+                "answer":
+                f"{employee_name} is on leave today."
+            }
+
+        return {
+
+            "answer":
+            f"{employee_name} is not on leave today."
         }
 
     return {
