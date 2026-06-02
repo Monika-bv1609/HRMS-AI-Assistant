@@ -276,3 +276,51 @@ def ask_hr(data: HRQuestion):
     )
 
     return result
+
+
+
+@router.get("/leave-types")
+def get_leave_types():
+
+    uid, models = get_models()
+
+    leave_types = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.leave.type",
+
+        "search_read",
+
+        [[]],
+
+        {
+
+            "fields": [
+
+                "name",
+
+                "leave_validation_type",
+
+                "requires_allocation",
+
+                "allocation_validation_type",
+
+                "request_unit",
+
+                "employee_requests",
+
+                "unpaid",
+
+                "support_document",
+
+                "allows_negative"
+            ]
+        }
+    )
+
+    return leave_types

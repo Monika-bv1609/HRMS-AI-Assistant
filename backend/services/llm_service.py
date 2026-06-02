@@ -30,6 +30,7 @@ def classify_intent(question):
             leave_today
             leave_count
             leave_status
+            leave_policy
 
             Examples:
 
@@ -97,5 +98,8 @@ def classify_intent(question):
 
     if "leave_status" in intent:
         return "leave_status"
+    
+    if "leave_policy" in intent:
+        return "leave_policy"
 
     return "unknown"
