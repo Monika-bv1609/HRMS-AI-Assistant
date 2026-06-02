@@ -2,6 +2,14 @@ from services.llm_service import (
     classify_intent
 )
 
+from memory.context_resolver import (
+    resolve_question
+)
+
+from memory.conversation_memory import (
+    memory_store
+)
+
 from services.odoo_service import (
 
     get_employee_count,
@@ -14,11 +22,22 @@ from services.odoo_service import (
 
 def process_question(question: str):
 
+    print("=" * 50)
+    print(f"ORIGINAL QUESTION: [{question}]")
+
+    question = resolve_question(
+        question
+    )
+
+    print(
+        f"QUESTION AFTER RESOLUTION: [{question}]"
+    )
+
     intent = classify_intent(
         question
     )
 
-    print(f"Detected Intent: [intent]")
+    print(f"INTENT: [{intent}]")
 
     if intent == "employee_count":
 
@@ -57,19 +76,56 @@ def process_question(question: str):
 
     if intent == "employee_search":
 
-        question_lower = question.lower()
+        question_lower = (
+            question.lower()
+        )
 
-        employee_name = (
+        if "find employee" in question_lower:
 
-            question_lower
+            employee_name = (
+                question_lower
+                .replace(
+                    "find employee",
+                    ""
+                )
+                .strip()
+                .rstrip(".!?")
+            )
 
-            .replace("find employee", "")
+        elif "search employee" in question_lower:
 
-            .replace("search employee", "")
+            employee_name = (
+                question_lower
+                .replace(
+                    "search employee",
+                    ""
+                )
+                .strip()
+                .rstrip(".!?")
+            )
 
-            .replace("employee details", "")
+        elif "employee details" in question_lower:
 
-            .strip()
+            employee_name = (
+                question_lower
+                .replace(
+                    "employee details",
+                    ""
+                )
+                .strip()
+                .rstrip(".!?")
+            )
+
+        else:
+
+            employee_name = (
+                memory_store.get(
+                    "employee_name"
+                )
+            )
+
+        print(
+            f"EXTRACTED EMPLOYEE: [{employee_name}]"
         )
 
         employees = search_employee(
@@ -85,6 +141,14 @@ def process_question(question: str):
             }
 
         employee = employees[0]
+
+        memory_store[
+            "employee_name"
+        ] = employee["name"]
+
+        print(
+            f"MEMORY UPDATED: {memory_store}"
+        )
 
         return {
 
