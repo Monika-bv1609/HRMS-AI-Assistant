@@ -10,6 +10,10 @@ from memory.conversation_memory import (
     memory_store
 )
 
+from services.employee_entity_extractor import (
+    extract_employee_entity
+)
+
 from services.odoo_service import (
 
     get_employee_count,
@@ -76,57 +80,30 @@ def process_question(question: str):
 
     if intent == "employee_search":
 
-        question_lower = (
-            question.lower()
+        entity = extract_employee_entity(
+            question
         )
-
-        if "find employee" in question_lower:
-
-            employee_name = (
-                question_lower
-                .replace(
-                    "find employee",
-                    ""
-                )
-                .strip()
-                .rstrip(".!?")
-            )
-
-        elif "search employee" in question_lower:
-
-            employee_name = (
-                question_lower
-                .replace(
-                    "search employee",
-                    ""
-                )
-                .strip()
-                .rstrip(".!?")
-            )
-
-        elif "employee details" in question_lower:
-
-            employee_name = (
-                question_lower
-                .replace(
-                    "employee details",
-                    ""
-                )
-                .strip()
-                .rstrip(".!?")
-            )
-
-        else:
-
-            employee_name = (
-                memory_store.get(
-                    "employee_name"
-                )
-            )
 
         print(
-            f"EXTRACTED EMPLOYEE: [{employee_name}]"
+            f"EXTRACTED ENTITY: {entity}"
         )
+
+        employee_name = entity.get(
+            "employee_name"
+        )
+
+        request_type = entity.get(
+            "request_type",
+            "details"
+        )
+
+        if not employee_name:
+
+            return {
+
+                "answer":
+                "Unable to identify employee."
+            }
 
         employees = search_employee(
             employee_name
@@ -149,6 +126,26 @@ def process_question(question: str):
         print(
             f"MEMORY UPDATED: {memory_store}"
         )
+
+        if request_type == "email":
+
+            return {
+
+                "answer":
+                employee.get(
+                    "work_email"
+                ) or "Email not available."
+            }
+
+        if request_type == "designation":
+
+            return {
+
+                "answer":
+                employee.get(
+                    "job_title"
+                ) or "Designation not available."
+            }
 
         return {
 
