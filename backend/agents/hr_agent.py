@@ -41,10 +41,53 @@ from services.odoo_service import (
     get_leave_type_details
 )
 
+from services.leave_application_entity_extractor import (
+    extract_leave_application
+)
+
 def process_question(question: str):
 
     print("=" * 50)
     print(f"ORIGINAL QUESTION: [{question}]")
+
+    if question.lower() in [
+
+        "yes",
+
+        "confirm",
+
+        "proceed",
+
+        "submit"
+    ]:
+
+        pending_leave = (
+
+            memory_store.get(
+                "pending_leave_request"
+            )
+        )
+
+        if not pending_leave:
+
+            return {
+
+                "answer":
+                "No pending leave request found."
+            }
+
+        return {
+
+            "answer":
+            f"""
+Pending Leave Found
+
+Leave Type: {pending_leave['leave_type']}
+Start Date: {pending_leave['start_date']}
+End Date: {pending_leave['end_date']}
+Reason: {pending_leave['reason']}
+"""
+        }
 
     question = resolve_question(
         question
@@ -299,6 +342,85 @@ def process_question(question: str):
     Supporting Documents: {leave_type['support_document']}
     Negative Balance Allowed: {leave_type['allows_negative']}
     """
+        }
+    
+
+    if intent == "leave_application":
+
+        leave_request = (
+            extract_leave_application(
+                question
+            )
+        )
+
+        memory_store[
+            "pending_leave_request"
+        ] = leave_request
+
+        print(
+            f"PENDING LEAVE: {memory_store['pending_leave_request']}"
+        )
+
+        if not leave_request:
+
+            return {
+
+                "answer":
+                "Unable to understand leave request."
+            }
+
+        return {
+
+            "answer":
+            f"""
+    Leave Request Summary
+
+    Leave Type: {leave_request['leave_type']}
+    Start Date: {leave_request['start_date']}
+    End Date: {leave_request['end_date']}
+    Reason: {leave_request['reason']}
+
+    Please confirm.
+    """
+        }
+
+    if question.lower() in [
+
+        "yes",
+
+        "confirm",
+
+        "proceed",
+
+        "submit"
+    ]:
+
+        pending_leave = (
+
+            memory_store.get(
+                "pending_leave_request"
+            )
+        )
+
+        if not pending_leave:
+
+            return {
+
+                "answer":
+                "No pending leave request found."
+            }
+
+        return {
+
+            "answer":
+            f"""
+Pending Leave Found
+
+Leave Type: {pending_leave['leave_type']}
+Start Date: {pending_leave['start_date']}
+End Date: {pending_leave['end_date']}
+Reason: {pending_leave['reason']}
+"""
         }
 
     return {
