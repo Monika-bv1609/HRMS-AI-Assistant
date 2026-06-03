@@ -169,3 +169,32 @@ def get_leave_type_details(
             return leave_type
 
     return None
+
+
+def create_test_leave():
+
+    uid, models = get_models()
+
+    leave_id = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.leave",
+
+        "create",
+
+        [{
+
+            "employee_id": 1,
+            "holiday_status_id": 2,
+            "request_date_from": "2026-06-03",
+            "request_date_to": "2026-06-03",
+            "name": "AI Test Leave"
+        }]
+    )
+
+    return leave_id

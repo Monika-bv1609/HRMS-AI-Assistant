@@ -323,4 +323,17 @@ def get_leave_types():
         }
     )
 
+@router.get("/test-create-leave")
+def test_create_leave():
+
+    from services.odoo_service import (
+        create_test_leave
+    )
+
+    leave_id = create_test_leave()
+
+    return {
+        "leave_id": leave_id
+    }
+
     return leave_types

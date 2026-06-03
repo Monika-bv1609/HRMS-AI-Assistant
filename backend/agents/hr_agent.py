@@ -50,6 +50,45 @@ def process_question(question: str):
     print("=" * 50)
     print(f"ORIGINAL QUESTION: [{question}]")
 
+    if question.lower() in [
+
+        "yes",
+
+        "confirm",
+
+        "proceed",
+
+        "submit"
+    ]:
+
+        pending_leave = (
+
+            memory_store.get(
+                "pending_leave_request"
+            )
+        )
+
+        if not pending_leave:
+
+            return {
+
+                "answer":
+                "No pending leave request found."
+            }
+
+        return {
+
+            "answer":
+            f"""
+Pending Leave Found
+
+Leave Type: {pending_leave['leave_type']}
+Start Date: {pending_leave['start_date']}
+End Date: {pending_leave['end_date']}
+Reason: {pending_leave['reason']}
+"""
+        }
+
     question = resolve_question(
         question
     )
@@ -314,6 +353,14 @@ def process_question(question: str):
             )
         )
 
+        memory_store[
+            "pending_leave_request"
+        ] = leave_request
+
+        print(
+            f"PENDING LEAVE: {memory_store['pending_leave_request']}"
+        )
+
         if not leave_request:
 
             return {
@@ -335,6 +382,45 @@ def process_question(question: str):
 
     Please confirm.
     """
+        }
+
+    if question.lower() in [
+
+        "yes",
+
+        "confirm",
+
+        "proceed",
+
+        "submit"
+    ]:
+
+        pending_leave = (
+
+            memory_store.get(
+                "pending_leave_request"
+            )
+        )
+
+        if not pending_leave:
+
+            return {
+
+                "answer":
+                "No pending leave request found."
+            }
+
+        return {
+
+            "answer":
+            f"""
+Pending Leave Found
+
+Leave Type: {pending_leave['leave_type']}
+Start Date: {pending_leave['start_date']}
+End Date: {pending_leave['end_date']}
+Reason: {pending_leave['reason']}
+"""
         }
 
     return {
