@@ -198,3 +198,77 @@ def create_test_leave():
     )
 
     return leave_id
+
+
+
+def search_leave_type(leave_type_name):
+
+    uid, models = get_models()
+
+    leave_types = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.leave.type",
+
+        "search_read",
+
+        [[
+
+            ("name", "ilike", leave_type_name)
+
+        ]],
+
+        {
+
+            "fields": [
+
+                "name"
+            ]
+        }
+    )
+
+    return leave_types
+
+
+def create_leave_request(leave_request):
+
+    uid, models = get_models()
+
+    leave_id = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.leave",
+
+        "create",
+
+        [[{
+
+            "employee_id":
+            leave_request["employee_id"],
+
+            "holiday_status_id":
+            leave_request["leave_type_id"],
+
+            "request_date_from":
+            leave_request["start_date"],
+
+            "request_date_to":
+            leave_request["end_date"],
+
+            "name":
+            leave_request.get("reason")
+            or "AI Leave Request"
+        }]]
+    )
+
+    return leave_id

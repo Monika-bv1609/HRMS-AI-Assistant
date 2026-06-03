@@ -20,7 +20,10 @@ from services.odoo_service import (
 
     get_leaves_today,
 
-    search_employee
+    search_employee,
+    search_leave_type,
+    create_leave_request
+
 )
 
 from services.leave_entity_extractor import (
@@ -76,17 +79,18 @@ def process_question(question: str):
                 "No pending leave request found."
             }
 
+        leave_id = create_leave_request(
+            pending_leave
+        )
+
+        memory_store[
+            "pending_leave_request"
+        ] = None
+
         return {
 
             "answer":
-            f"""
-Pending Leave Found
-
-Leave Type: {pending_leave['leave_type']}
-Start Date: {pending_leave['start_date']}
-End Date: {pending_leave['end_date']}
-Reason: {pending_leave['reason']}
-"""
+            f"Leave request created successfully. Leave ID: {leave_id}"
         }
 
     question = resolve_question(
@@ -353,6 +357,52 @@ Reason: {pending_leave['reason']}
             )
         )
 
+        employee_name = leave_request.get(
+            "employee_name"
+        )
+
+        leave_type_name = leave_request.get(
+            "leave_type"
+        )
+
+        if leave_type_name:
+
+            leave_types = search_leave_type(
+                leave_type_name
+            )
+
+            if not leave_types:
+
+                return {
+
+                    "answer":
+                    f"Leave type '{leave_type_name}' not found."
+                }
+
+            leave_request[
+                "leave_type_id"
+            ] = leave_types[0]["id"]
+
+            print(
+                f"LEAVE TYPE RESOLVED: {leave_types[0]['id']}"
+            )
+
+        if employee_name:
+
+            employees = search_employee(
+                employee_name
+            )
+
+            if employees:
+
+                leave_request[
+                    "employee_id"
+                ] = employees[0]["id"]
+
+                print(
+                    f"EMPLOYEE RESOLVED: {employees[0]['id']}"
+                )
+
         memory_store[
             "pending_leave_request"
         ] = leave_request
@@ -373,55 +423,20 @@ Reason: {pending_leave['reason']}
 
             "answer":
             f"""
-    Leave Request Summary
+        Leave Request Summary
 
-    Leave Type: {leave_request['leave_type']}
-    Start Date: {leave_request['start_date']}
-    End Date: {leave_request['end_date']}
-    Reason: {leave_request['reason']}
+        Employee: {leave_request.get('employee_name')}
+        Employee ID: {leave_request.get('employee_id')}
+        Leave Type: {leave_request.get('leave_type')}
+        Leave Type ID:{leave_request.get('leave_type_id')}
+        Start Date: {leave_request.get('start_date')}
+        End Date: {leave_request.get('end_date')}
+        Reason: {leave_request.get('reason')}
 
-    Please confirm.
-    """
+        Please confirm.
+        """
         }
 
-    if question.lower() in [
-
-        "yes",
-
-        "confirm",
-
-        "proceed",
-
-        "submit"
-    ]:
-
-        pending_leave = (
-
-            memory_store.get(
-                "pending_leave_request"
-            )
-        )
-
-        if not pending_leave:
-
-            return {
-
-                "answer":
-                "No pending leave request found."
-            }
-
-        return {
-
-            "answer":
-            f"""
-Pending Leave Found
-
-Leave Type: {pending_leave['leave_type']}
-Start Date: {pending_leave['start_date']}
-End Date: {pending_leave['end_date']}
-Reason: {pending_leave['reason']}
-"""
-        }
 
     return {
 

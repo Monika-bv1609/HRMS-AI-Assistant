@@ -337,3 +337,96 @@ def test_create_leave():
     }
 
     return leave_types
+
+
+@router.get("/users")
+def get_users():
+
+    uid, models = get_models()
+
+    users = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "res.users",
+
+        "search_read",
+
+        [[]],
+
+        {
+            "fields": [
+                "name",
+                "groups_id"
+            ]
+        }
+    )
+
+    return users
+
+
+@router.get("/groups")
+def get_groups():
+
+    uid, models = get_models()
+
+    groups = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "res.groups",
+
+        "search_read",
+
+        [[]],
+
+        {
+            "fields": [
+                "name",
+                "category_id"
+            ]
+        }
+    )
+
+    return groups
+
+
+
+@router.get("/group-xmlids")
+def get_group_xmlids():
+
+    uid, models = get_models()
+
+    records = models.execute_kw(
+
+        DB,
+        uid,
+        PASSWORD,
+
+        "ir.model.data",
+
+        "search_read",
+
+        [[
+            ("model", "=", "res.groups")
+        ]],
+
+        {
+            "fields": [
+                "module",
+                "name",
+                "res_id"
+            ],
+            "limit": 100
+        }
+    )
+
+    return records
