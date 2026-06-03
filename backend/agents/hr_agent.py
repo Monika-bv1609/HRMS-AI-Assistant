@@ -353,6 +353,26 @@ Reason: {pending_leave['reason']}
             )
         )
 
+        employee_name = leave_request.get(
+            "employee_name"
+        )
+
+        if employee_name:
+
+            employees = search_employee(
+                employee_name
+            )
+
+            if employees:
+
+                leave_request[
+                    "employee_id"
+                ] = employees[0]["id"]
+
+                print(
+                    f"EMPLOYEE RESOLVED: {employees[0]['id']}"
+                )
+
         memory_store[
             "pending_leave_request"
         ] = leave_request
@@ -376,6 +396,7 @@ Reason: {pending_leave['reason']}
         Leave Request Summary
 
         Employee: {leave_request.get('employee_name')}
+        Employee ID: {leave_request.get('employee_id')}
         Leave Type: {leave_request.get('leave_type')}
         Start Date: {leave_request.get('start_date')}
         End Date: {leave_request.get('end_date')}
