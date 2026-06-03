@@ -373,15 +373,16 @@ Reason: {pending_leave['reason']}
 
             "answer":
             f"""
-    Leave Request Summary
+        Leave Request Summary
 
-    Leave Type: {leave_request['leave_type']}
-    Start Date: {leave_request['start_date']}
-    End Date: {leave_request['end_date']}
-    Reason: {leave_request['reason']}
+        Employee: {leave_request.get('employee_name')}
+        Leave Type: {leave_request.get('leave_type')}
+        Start Date: {leave_request.get('start_date')}
+        End Date: {leave_request.get('end_date')}
+        Reason: {leave_request.get('reason')}
 
-    Please confirm.
-    """
+        Please confirm.
+        """
         }
 
     if question.lower() in [
