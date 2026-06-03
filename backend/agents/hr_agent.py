@@ -41,6 +41,10 @@ from services.odoo_service import (
     get_leave_type_details
 )
 
+from services.leave_application_entity_extractor import (
+    extract_leave_application
+)
+
 def process_question(question: str):
 
     print("=" * 50)
@@ -298,6 +302,38 @@ def process_question(question: str):
     Request Unit: {leave_type['request_unit']}
     Supporting Documents: {leave_type['support_document']}
     Negative Balance Allowed: {leave_type['allows_negative']}
+    """
+        }
+    
+
+    if intent == "leave_application":
+
+        leave_request = (
+            extract_leave_application(
+                question
+            )
+        )
+
+        if not leave_request:
+
+            return {
+
+                "answer":
+                "Unable to understand leave request."
+            }
+
+        return {
+
+            "answer":
+            f"""
+    Leave Request Summary
+
+    Leave Type: {leave_request['leave_type']}
+    Start Date: {leave_request['start_date']}
+    End Date: {leave_request['end_date']}
+    Reason: {leave_request['reason']}
+
+    Please confirm.
     """
         }
 
