@@ -271,8 +271,13 @@ def get_leaves_today():
 @router.post("/ask-hr")
 def ask_hr(data: HRQuestion):
 
+    print(
+        f"USER ID RECEIVED: {data.user_id}"
+    )
+
     result = process_question(
-        data.question
+        data.question,
+        data.user_id
     )
 
     return result
@@ -430,3 +435,33 @@ def get_group_xmlids():
     )
 
     return records
+
+
+@router.get("/users")
+def get_users():
+
+    uid, models = get_models()
+
+    users = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "res.users",
+
+        "search_read",
+
+        [[]],
+
+        {
+            "fields": [
+                "name",
+                "groups_id"
+            ]
+        }
+    )
+
+    return users
