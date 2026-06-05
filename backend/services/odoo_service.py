@@ -239,7 +239,59 @@ def create_leave_request(leave_request):
 
     uid, models = get_models()
 
-    leave_id = models.execute_kw(
+    try:
+
+        leave_id = models.execute_kw(
+
+            DB,
+
+            uid,
+
+            PASSWORD,
+
+            "hr.leave",
+
+            "create",
+
+            [[{
+
+                "employee_id":
+                leave_request["employee_id"],
+
+                "holiday_status_id":
+                leave_request["leave_type_id"],
+
+                "request_date_from":
+                leave_request["start_date"],
+
+                "request_date_to":
+                leave_request["end_date"],
+
+                "name":
+                leave_request.get("reason")
+                or "AI Leave Request"
+            }]]
+        )
+
+        return {
+
+            "success": True,
+            "leave_id": leave_id
+        }
+    except Exception as e:
+        
+        return {
+
+        "success": False,
+        "error": str(e)
+    }
+
+
+def get_user(user_id):
+
+    uid, models = get_models()
+
+    users = models.execute_kw(
 
         DB,
 
@@ -247,28 +299,154 @@ def create_leave_request(leave_request):
 
         PASSWORD,
 
-        "hr.leave",
+        "res.users",
 
-        "create",
+        "read",
 
-        [[{
+        [[user_id]],
 
-            "employee_id":
-            leave_request["employee_id"],
-
-            "holiday_status_id":
-            leave_request["leave_type_id"],
-
-            "request_date_from":
-            leave_request["start_date"],
-
-            "request_date_to":
-            leave_request["end_date"],
-
-            "name":
-            leave_request.get("reason")
-            or "AI Leave Request"
-        }]]
+        {
+            "fields": [
+                "name",
+                "groups_id"
+            ]
+        }
     )
 
-    return leave_id
+    return users[0] if users else None
+
+
+def get_employee_from_user(
+    user_id
+):
+
+    uid, models = get_models()
+
+    employee = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "hr.employee",
+
+        "search_read",
+
+        [[
+            (
+                "user_id",
+                "=",
+                user_id
+            )
+        ]],
+
+        {
+            "fields": [
+                "id",
+                "name"
+            ],
+            "limit": 1
+        }
+    )
+
+    return (
+        employee[0]
+        if employee
+        else None
+    )
+
+
+def get_user_group_xmlids(user_id):
+
+    uid, models = get_models()
+
+    user = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "res.users",
+
+        "read",
+
+        [[user_id]],
+
+        {
+            "fields": [
+                "groups_id"
+            ]
+        }
+    )[0]
+
+    result = []
+
+    for group_id in user["groups_id"]:
+
+        xml_data = models.execute_kw(
+
+            DB,
+
+            uid,
+
+            PASSWORD,
+
+            "ir.model.data",
+
+            "search_read",
+
+            [[
+
+                ("model", "=", "res.groups"),
+
+                ("res_id", "=", group_id)
+
+            ]],
+
+            {
+
+                "fields": [
+
+                    "module",
+
+                    "name"
+                ]
+            }
+        )
+
+        if xml_data:
+
+            result.append(
+
+                f"{xml_data[0]['module']}."
+                f"{xml_data[0]['name']}"
+            )
+
+    return result
+
+
+def can_apply_leave_for_others(user_id):
+
+    xml_ids = get_user_group_xmlids(
+        user_id
+    )
+
+    allowed_groups = [
+
+        "base.group_system",
+
+        "hr.group_hr_manager",
+
+        "hr_holidays.group_hr_holidays_manager",
+
+        "hr_holidays.group_hr_holidays_responsible"
+    ]
+
+    return any(
+        group in xml_ids
+        for group in allowed_groups
+    )

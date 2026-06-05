@@ -465,3 +465,68 @@ def get_users():
     )
 
     return users
+
+
+@router.get("/group-xmlids/{user_id}")
+def get_group_xmlids(user_id: int):
+
+    uid, models = get_models()
+
+    user = models.execute_kw(
+
+        DB,
+
+        uid,
+
+        PASSWORD,
+
+        "res.users",
+
+        "read",
+
+        [[user_id]],
+
+        {
+            "fields": [
+                "groups_id"
+            ]
+        }
+    )[0]
+
+    result = []
+
+    for group_id in user["groups_id"]:
+
+        xml_data = models.execute_kw(
+
+            DB,
+
+            uid,
+
+            PASSWORD,
+
+            "ir.model.data",
+
+            "search_read",
+
+            [[
+
+                ("model", "=", "res.groups"),
+                ("res_id", "=", group_id)
+            ]],
+
+            {
+                "fields": [
+                    "module",
+                    "name"
+                ]
+            }
+        )
+
+        if xml_data:
+
+            result.append(
+                f"{xml_data[0]['module']}.{xml_data[0]['name']}"
+            )
+
+    return result
