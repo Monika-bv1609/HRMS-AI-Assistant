@@ -48,10 +48,11 @@ from services.leave_application_entity_extractor import (
     extract_leave_application
 )
 
-def process_question(question: str):
+def process_question(question: str, user_id: int = None):
 
     print("=" * 50)
     print(f"ORIGINAL QUESTION: [{question}]")
+    print(f"CURRENT USER ID: {user_id}")
 
     if question.lower() in [
 
