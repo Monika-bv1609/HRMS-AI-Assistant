@@ -22,7 +22,10 @@ from services.odoo_service import (
 
     search_employee,
     search_leave_type,
-    create_leave_request
+    create_leave_request,
+    get_user,
+    get_employee_from_user,
+    can_apply_leave_for_others
 
 )
 
@@ -53,6 +56,24 @@ def process_question(question: str, user_id: int = None):
     print("=" * 50)
     print(f"ORIGINAL QUESTION: [{question}]")
     print(f"CURRENT USER ID: {user_id}")
+
+    current_user = get_user(
+        user_id
+    )
+
+    print(
+        f"//////// CURRENT USER: {current_user}"
+    )
+
+    current_employee = (
+        get_employee_from_user(
+            user_id
+        )
+    )
+
+    print(
+        f"CURRENT EMPLOYEE: {current_employee}"
+    )
 
     if question.lower() in [
 
@@ -88,10 +109,22 @@ def process_question(question: str, user_id: int = None):
             "pending_leave_request"
         ] = None
 
+        result = create_leave_request(
+            pending_leave
+        )
+
+        if not result["success"]:
+
+            return {
+
+                "answer":
+                f"Unable to create leave.\n\n{result['error']}"
+            }
+
         return {
 
             "answer":
-            f"Leave request created successfully. Leave ID: {leave_id}"
+            f"Leave request created successfully. Leave ID: {result['leave_id']}"
         }
 
     question = resolve_question(
@@ -357,6 +390,22 @@ def process_question(question: str, user_id: int = None):
                 question
             )
         )
+        if not leave_request.get(
+            "employee_name"
+        ):
+
+            leave_request[
+                "employee_name"
+            ] = current_employee["name"]
+
+            leave_request[
+                "employee_id"
+            ] = current_employee["id"]
+
+            print(
+                f"SELF LEAVE DETECTED: "
+                f"{current_employee['name']}"
+            )
 
         employee_name = leave_request.get(
             "employee_name"
@@ -394,15 +443,65 @@ def process_question(question: str, user_id: int = None):
                 employee_name
             )
 
-            if employees:
+            if not employees:
 
-                leave_request[
+                return {
+
+                    "answer":
+                    f"Employee '{employee_name}' not found."
+                }
+
+            leave_request[
+                "employee_id"
+            ] = employees[0]["id"]
+
+            print(
+                f"EMPLOYEE RESOLVED: {employees[0]['id']}"
+            )
+
+            requested_employee_id = (
+                leave_request.get(
                     "employee_id"
-                ] = employees[0]["id"]
-
-                print(
-                    f"EMPLOYEE RESOLVED: {employees[0]['id']}"
                 )
+            )
+
+            current_employee_id = (
+
+                current_employee["id"]
+
+                if current_employee
+
+                else None
+            )
+
+            if (
+
+                requested_employee_id
+
+                and
+
+                current_employee_id
+
+                and
+
+                requested_employee_id
+                !=
+                current_employee_id
+            ):
+
+                allowed = (
+                    can_apply_leave_for_others(
+                        user_id
+                    )
+                )
+
+                if not allowed:
+
+                    return {
+
+                        "answer":
+                        "You do not have permission to create leave for other employees."
+                    }
 
         memory_store[
             "pending_leave_request"

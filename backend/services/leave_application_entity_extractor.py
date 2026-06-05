@@ -1,24 +1,35 @@
 import json
 
-from datetime import date
+from datetime import (
+    date,
+    timedelta
+)
 
 from services.llm_service import client
 
 
-def extract_leave_application(question):
+def extract_leave_application(
+    question
+):
 
-    today = str(date.today())
+    today = date.today()
 
-    response = client.chat.completions.create(
+    tomorrow = (
+        today
+        + timedelta(days=1)
+    )
 
-        model="llama-3.1-8b-instant",
+    response = (
+        client.chat.completions.create(
 
-        messages=[
+            model="llama-3.1-8b-instant",
 
-            {
-                "role": "system",
+            messages=[
 
-                "content": f"""
+                {
+                    "role": "system",
+
+                    "content": f"""
 You are a JSON extractor.
 
 Today's date is {today}.
@@ -43,8 +54,8 @@ Output:
 {{
     "employee_name": null,
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-04",
-    "end_date": "2026-06-04",
+    "start_date": "{tomorrow}",
+    "end_date": "{tomorrow}",
     "reason": "fever"
 }}
 
@@ -56,8 +67,8 @@ Output:
 {{
     "employee_name": "Rachel Perry",
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-04",
-    "end_date": "2026-06-04",
+    "start_date": "{tomorrow}",
+    "end_date": "{tomorrow}",
     "reason": "sick"
 }}
 
@@ -69,26 +80,43 @@ Output:
 {{
     "employee_name": "Mitchell Admin",
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-04",
-    "end_date": "2026-06-04",
+    "start_date": "{tomorrow}",
+    "end_date": "{tomorrow}",
+    "reason": null
+}}
+
+Question:
+Create Paid Time Off for Rachel Perry from 2026-06-10 to 2026-06-15
+
+Output:
+
+{{
+    "employee_name": "Rachel Perry",
+    "leave_type": "Paid Time Off",
+    "start_date": "2026-06-10",
+    "end_date": "2026-06-15",
     "reason": null
 }}
 
 Rules:
+
+- Use today's date as reference
+- Convert relative dates like tomorrow, next week, next Monday into actual dates
 - Return ONLY JSON
 - No explanation
 - No markdown
 """
-            },
+                },
 
-            {
-                "role": "user",
-                "content": question
-            }
+                {
+                    "role": "user",
+                    "content": question
+                }
 
-        ],
+            ],
 
-        temperature=0
+            temperature=0
+        )
     )
 
     result = (
@@ -106,8 +134,14 @@ Rules:
 
     try:
 
-        return json.loads(result)
+        return json.loads(
+            result
+        )
 
-    except:
+    except Exception as e:
+
+        print(
+            f"JSON ERROR: {e}"
+        )
 
         return None
