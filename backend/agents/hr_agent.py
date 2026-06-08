@@ -101,17 +101,13 @@ def process_question(question: str, user_id: int = None):
                 "No pending leave request found."
             }
 
-        leave_id = create_leave_request(
+        result = create_leave_request(
             pending_leave
         )
 
         memory_store[
             "pending_leave_request"
         ] = None
-
-        result = create_leave_request(
-            pending_leave
-        )
 
         if not result["success"]:
 
