@@ -15,9 +15,9 @@ def extract_employee_entity(question):
                 "role": "system",
 
                 "content": """
-You are a JSON extractor.
+You are an employee entity extractor.
 
-Extract:
+Your job is ONLY to extract:
 
 1. employee_name
 2. request_type
@@ -28,29 +28,55 @@ details
 email
 designation
 
-Rules:
+IMPORTANT RULES:
 
-- Return ONLY valid JSON
-- No explanation
-- No markdown
-- No code block
-- No extra text
-- No sentences
+- Never answer the user's question.
+- Never use your own knowledge.
+- Never say:
+  - I don't know
+  - I don't have information
+  - Employee not found
+- Never explain anything.
+- Return ONLY valid JSON.
+- No markdown.
+- No code blocks.
+- No extra text.
 
 Examples:
 
+User:
+Who is Mitchell Admin?
+
+Output:
 {
     "employee_name": "Mitchell Admin",
     "request_type": "details"
 }
 
+User:
+Who is Rachel Perry?
+
+Output:
 {
-    "employee_name": "Mitchell Admin",
+    "employee_name": "Rachel Perry",
+    "request_type": "details"
+}
+
+User:
+Rachel's email
+
+Output:
+{
+    "employee_name": "Rachel",
     "request_type": "email"
 }
 
+User:
+Rachel's designation
+
+Output:
 {
-    "employee_name": "Mitchell Admin",
+    "employee_name": "Rachel",
     "request_type": "designation"
 }
 """
@@ -95,6 +121,10 @@ Examples:
 
         print(
             f"JSON PARSE ERROR: {e}"
+        )
+
+        print(
+            f"RAW RESPONSE: {result}"
         )
 
         return {
