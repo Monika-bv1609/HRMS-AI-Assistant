@@ -107,7 +107,90 @@ Apply leave for me tomorrow
 
 Output:
 {
-    "tool": "leave_application"
+    "tool": "leave_application",
+    "employee_name": null,
+    "leave_type": "Sick Time Off",
+    "start_date": "2026-06-09",
+    "end_date": "2026-06-09",
+    "reason": null
+}
+
+User:
+Apply sick leave for me tomorrow
+
+Output:
+{
+    "tool": "leave_application",
+    "employee_name": null,
+    "leave_type": "Sick Time Off",
+    "start_date": "2026-06-09",
+    "end_date": "2026-06-09",
+    "reason": null
+}
+
+User:
+Apply leave for Rachel Perry tomorrow
+
+Output:
+{
+    "tool": "leave_application",
+    "employee_name": "Rachel Perry",
+    "leave_type": "Sick Time Off",
+    "start_date": "2026-06-09",
+    "end_date": "2026-06-09",
+    "reason": null
+}
+
+User:
+Apply leave for me tomorrow
+
+Output:
+{
+    "tool": "leave_application",
+    "employee_name": null,
+    "leave_type": "Sick Time Off",
+    "start_date": "2026-06-09",
+    "end_date": "2026-06-09",
+    "reason": null
+}
+
+User:
+Apply sick leave for me tomorrow
+
+Output:
+{
+    "tool": "leave_application",
+    "employee_name": null,
+    "leave_type": "Sick Time Off",
+    "start_date": "2026-06-09",
+    "end_date": "2026-06-09",
+    "reason": null
+}
+
+User:
+Apply leave for Rachel Perry tomorrow
+
+Output:
+{
+    "tool": "leave_application",
+    "employee_name": "Rachel Perry",
+    "leave_type": "Sick Time Off",
+    "start_date": "2026-06-09",
+    "end_date": "2026-06-09",
+    "reason": null
+}
+
+User:
+Apply leave for Rachel Perry tomorrow because she is sick
+
+Output:
+{
+    "tool": "leave_application",
+    "employee_name": "Rachel Perry",
+    "leave_type": "Sick Time Off",
+    "start_date": "2026-06-09",
+    "end_date": "2026-06-09",
+    "reason": "sick"
 }
 
 Rules:

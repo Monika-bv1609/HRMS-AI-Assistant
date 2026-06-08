@@ -390,11 +390,17 @@ def process_question(question: str, user_id: int = None):
 
     if intent == "leave_application":
 
-        leave_request = (
-            extract_leave_application(
-                question
-            )
+        leave_request = tool_data.copy()
+
+        leave_request.pop(
+            "tool",
+            None
         )
+
+        print(
+            f"LEAVE REQUEST FROM ROUTER: {leave_request}"
+        )
+    
         if not leave_request.get(
             "employee_name"
         ):
