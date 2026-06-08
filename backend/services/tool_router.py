@@ -15,41 +15,64 @@ def select_tool(question):
                 "role": "system",
 
                 "content": """
-You are a classifier.
+You are an HR tool router.
 
-Choose ONLY ONE value from:
+Available tools:
 
 employee_search
 leave_status
 leave_policy
-apply_leave
+leave_application
+
+Return ONLY valid JSON.
 
 Examples:
 
+User:
 Who is Rachel Perry?
-employee_search
 
+Output:
+{
+    "tool": "employee_search",
+    "employee_name": "Rachel Perry"
+}
+
+User:
 Rachel's email
-employee_search
 
+Output:
+{
+    "tool": "employee_search",
+    "employee_name": "Rachel",
+    "request_type": "email"
+}
+
+User:
 Is Rachel on leave today?
-leave_status
 
-Who is on leave today?
-leave_status
+Output:
+{
+    "tool": "leave_status",
+    "employee_name": "Rachel"
+}
 
-What leave types are available?
-leave_policy
-
+User:
 Apply leave for me tomorrow
-apply_leave
 
-Rules:
-- Return only the tool name.
-- Do not answer the question.
-- Do not explain.
-- Do not use JSON.
-- Output must be one word from the list above.
+Output:
+{
+    "tool": "leave_application"
+}
+
+User:
+What leave types are available?
+
+Output:
+{
+    "tool": "leave_policy"
+}
+
+Return only JSON.
 """
             },
 
@@ -75,4 +98,4 @@ Rules:
         f"TOOL ROUTER RAW: {result}"
     )
 
-    return result
+    return json.loads(result)
