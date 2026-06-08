@@ -275,11 +275,7 @@ def process_question(question: str, user_id: int = None):
 
     if intent == "leave_status":
 
-        entity = extract_leave_entity(
-            question
-        )
-
-        employee_name = entity.get(
+        employee_name = tool_data.get(
             "employee_name"
         )
 

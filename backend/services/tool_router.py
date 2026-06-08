@@ -34,7 +34,8 @@ Who is Rachel Perry?
 Output:
 {
     "tool": "employee_search",
-    "employee_name": "Rachel Perry"
+    "employee_name": "Rachel Perry",
+    "request_type": "details"
 }
 
 User:
@@ -43,25 +44,45 @@ Rachel's email
 Output:
 {
     "tool": "employee_search",
-    "employee_name": "Rachel",
+    "employee_name": "Rachel Perry",
     "request_type": "email"
 }
 
 User:
-Is Rachel on leave today?
+Rachel's designation
+
+Output:
+{
+    "tool": "employee_search",
+    "employee_name": "Rachel Perry",
+    "request_type": "designation"
+}
+
+User:
+Is Rachel Perry on leave today?
 
 Output:
 {
     "tool": "leave_status",
-    "employee_name": "Rachel"
+    "employee_name": "Rachel Perry"
 }
 
 User:
-Apply leave for me tomorrow
+Is she on leave today?
 
 Output:
 {
-    "tool": "leave_application"
+    "tool": "leave_status",
+    "employee_name": "Rachel Perry"
+}
+
+User:
+Who is on leave today?
+
+Output:
+{
+    "tool": "leave_status",
+    "employee_name": null
 }
 
 User:
@@ -72,7 +93,31 @@ Output:
     "tool": "leave_policy"
 }
 
-Return only JSON.
+User:
+Tell me about Sick Time Off
+
+Output:
+{
+    "tool": "leave_policy",
+    "leave_type": "Sick Time Off"
+}
+
+User:
+Apply leave for me tomorrow
+
+Output:
+{
+    "tool": "leave_application"
+}
+
+Rules:
+
+- Return ONLY JSON.
+- Never explain.
+- Never answer the question.
+- No markdown.
+- No code blocks.
+- No extra text.
 """
             },
 
@@ -87,6 +132,7 @@ Return only JSON.
     )
 
     result = (
+
         response
         .choices[0]
         .message
@@ -98,4 +144,19 @@ Return only JSON.
         f"TOOL ROUTER RAW: {result}"
     )
 
-    return json.loads(result)
+    try:
+
+        return json.loads(
+            result
+        )
+
+    except Exception as e:
+
+        print(
+            f"TOOL ROUTER JSON ERROR: {e}"
+        )
+
+        return {
+
+            "tool": "unknown"
+        }
