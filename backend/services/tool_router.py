@@ -193,6 +193,32 @@ Output:
     "reason": "sick"
 }
 
+User:
+What leave types are available?
+
+Output:
+{
+    "tool": "leave_policy"
+}
+
+User:
+Tell me about Sick Time Off
+
+Output:
+{
+    "tool": "leave_policy",
+    "leave_type": "Sick Time Off"
+}
+
+User:
+Explain Casual Leave
+
+Output:
+{
+    "tool": "leave_policy",
+    "leave_type": "Casual Leave"
+}
+
 Rules:
 
 - Return ONLY JSON.
