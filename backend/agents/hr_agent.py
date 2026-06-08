@@ -10,9 +10,7 @@ from memory.conversation_memory import (
     memory_store
 )
 
-from services.employee_entity_extractor import (
-    extract_employee_entity
-)
+
 
 from services.odoo_service import (
 
@@ -29,27 +27,20 @@ from services.odoo_service import (
 
 )
 
-from services.leave_entity_extractor import (
-    extract_leave_entity
-)
 
 from services.odoo_service import (
     get_leave_count_today,
     is_employee_on_leave_today
 )
 
-from services.leave_policy_entity_extractor import (
-    extract_leave_policy_entity
-)
+
 
 from services.odoo_service import (
     get_leave_types,
     get_leave_type_details
 )
 
-from services.leave_application_entity_extractor import (
-    extract_leave_application
-)
+
 
 from services.confirmation_classifier import (
     classify_confirmation
