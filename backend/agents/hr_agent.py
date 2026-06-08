@@ -339,14 +339,9 @@ def process_question(question: str, user_id: int = None):
                 )
             }
 
-        entity = (
-            extract_leave_policy_entity(
-                question
-            )
-        )
 
         leave_type_name = (
-            entity.get(
+            tool_data.get(
                 "leave_type"
             )
         )
