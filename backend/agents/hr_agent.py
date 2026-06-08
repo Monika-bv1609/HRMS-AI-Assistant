@@ -134,11 +134,16 @@ def process_question(question: str, user_id: int = None):
         f"QUESTION AFTER RESOLUTION: [{question}]"
     )
 
-    intent = classify_intent(
+    from services.tool_router import (
+        select_tool
+    )
+
+
+    intent = select_tool(
         question
     )
 
-    print(f"INTENT: [{intent}]")
+    print(f"TOOL: [{intent}]")
 
     if intent == "employee_count":
 
