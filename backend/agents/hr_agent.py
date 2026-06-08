@@ -139,8 +139,17 @@ def process_question(question: str, user_id: int = None):
     )
 
 
-    intent = select_tool(
+    tool_data = select_tool(
         question
+    )
+
+
+    print(
+        f"TOOL DATA: {tool_data}"
+    )
+
+    intent = tool_data.get(
+        "tool"
     )
 
     print(f"TOOL: [{intent}]")
@@ -182,21 +191,17 @@ def process_question(question: str, user_id: int = None):
 
     if intent == "employee_search":
 
-        entity = extract_employee_entity(
-            question
-        )
-
-        print(
-            f"EXTRACTED ENTITY: {entity}"
-        )
-
-        employee_name = entity.get(
+        employee_name = tool_data.get(
             "employee_name"
         )
 
-        request_type = entity.get(
+        request_type = tool_data.get(
             "request_type",
             "details"
+        )
+
+        print(
+            f"EMPLOYEE NAME: {employee_name}"
         )
 
         if not employee_name:
@@ -270,11 +275,7 @@ def process_question(question: str, user_id: int = None):
 
     if intent == "leave_status":
 
-        entity = extract_leave_entity(
-            question
-        )
-
-        employee_name = entity.get(
+        employee_name = tool_data.get(
             "employee_name"
         )
 
