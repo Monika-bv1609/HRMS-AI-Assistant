@@ -51,6 +51,10 @@ from services.leave_application_entity_extractor import (
     extract_leave_application
 )
 
+from services.confirmation_classifier import (
+    classify_confirmation
+)
+
 def process_question(question: str, user_id: int = None):
 
     print("=" * 50)
@@ -75,57 +79,56 @@ def process_question(question: str, user_id: int = None):
         f"CURRENT EMPLOYEE: {current_employee}"
     )
 
-    if question.lower() in [
-
-        "yes",
-
-        "confirm",
-
-        "proceed",
-
-        "submit"
-    ]:
-
-        pending_leave = (
-
-            memory_store.get(
-                "pending_leave_request"
-            )
-        )
-
-        if not pending_leave:
-
-            return {
-
-                "answer":
-                "No pending leave request found."
-            }
-
-        result = create_leave_request(
-            pending_leave
-        )
-
-        memory_store[
-            "pending_leave_request"
-        ] = None
-
-        if not result["success"]:
-
-            return {
-
-                "answer":
-                f"Unable to create leave.\n\n{result['error']}"
-            }
-
-        return {
-
-            "answer":
-            f"Leave request created successfully. Leave ID: {result['leave_id']}"
-        }
-
-    question = resolve_question(
-        question
+    pending_leave = memory_store.get(
+        "pending_leave_request"
     )
+
+    if pending_leave:
+
+        confirmation = classify_confirmation(
+            question
+        )
+
+        if confirmation == "YES":
+
+            result = create_leave_request(
+                pending_leave
+            )
+
+            memory_store[
+                "pending_leave_request"
+            ] = None
+
+            if not result["success"]:
+
+                return {
+
+                    "answer":
+                    f"Unable to create leave.\n\n{result['error']}"
+                }
+
+            return {
+
+                "answer":
+                f"Leave request created successfully. Leave ID: {result['leave_id']}"
+            }
+
+        elif confirmation == "NO":
+
+            memory_store[
+                "pending_leave_request"
+            ] = None
+
+            return {
+
+                "answer":
+                "Leave request cancelled."
+            }
+            
+
+        question = resolve_question(
+            question
+        )
 
     print(
         f"QUESTION AFTER RESOLUTION: [{question}]"
