@@ -16,7 +16,7 @@ from agents.employee_agent import (
 from agents.leave_agent import (
     leave_agent
 )
-
+from agents.policy_agent import policy_agent
 
 graph_builder = StateGraph(
     HRState
@@ -37,6 +37,11 @@ graph_builder.add_node(
     leave_agent
 )
 
+graph_builder.add_node(
+    "policy",
+    policy_agent
+)
+
 graph_builder.add_edge(
     START,
     "supervisor"
@@ -49,12 +54,13 @@ graph_builder.add_conditional_edges(
     lambda state: state["next_agent"],
     {
         "employee": "employee",
-        "leave": "leave"
+        "leave": "leave",
+        "policy": "policy"
     }
 )
 
 graph_builder.add_edge(
-    "leave",
+    "policy",
     END
 )
 
