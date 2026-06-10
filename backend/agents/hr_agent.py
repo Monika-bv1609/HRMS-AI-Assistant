@@ -10,6 +10,7 @@ from memory.conversation_memory import (
     memory_store
 )
 
+from services.rag_service import ask_rag
 
 
 from services.odoo_service import (
@@ -309,69 +310,34 @@ def process_question(question: str, user_id: int = None):
 
     if intent == "leave_policy":
 
-        if "available" in question.lower():
+        print(">>>>>>>> NEW POLICY AGENT EXECUTED <<<<<<<<")
 
-            leave_types = get_leave_types()
+        try:
 
-            names = [
+            rag_response = ask_rag(
+                question
+            )
 
-                leave_type["name"]
-
-                for leave_type in leave_types
-            ]
+            print(
+                f"RAG RESPONSE: {rag_response}"
+            )
 
             return {
 
                 "answer":
-                "Available leave types:\n\n"
-                + "\n".join(
-                    f"• {name}"
-                    for name in names
+                rag_response.get(
+                    "answer",
+                    "No answer found."
                 )
             }
 
-
-        leave_type_name = (
-            tool_data.get(
-                "leave_type"
-            )
-        )
-
-        if not leave_type_name:
+        except Exception as e:
 
             return {
 
                 "answer":
-                "Unable to identify leave type."
+                f"RAG Error: {str(e)}"
             }
-
-        leave_type = (
-            get_leave_type_details(
-                leave_type_name
-            )
-        )
-
-        if not leave_type:
-
-            return {
-
-                "answer":
-                "Leave type not found."
-            }
-
-        return {
-
-            "answer":
-            f"""
-    Leave Type: {leave_type['name']}
-
-    Approval: {leave_type['leave_validation_type']}
-    Allocation Required: {leave_type['requires_allocation']}
-    Request Unit: {leave_type['request_unit']}
-    Supporting Documents: {leave_type['support_document']}
-    Negative Balance Allowed: {leave_type['allows_negative']}
-    """
-        }
     
 
     if intent == "leave_application":
