@@ -3,6 +3,9 @@ from langgraph.graph import (
     START,
     END
 )
+from agents.leave_application_agent import (
+    leave_application_agent
+)
 
 from graph.state import HRState
 
@@ -41,6 +44,10 @@ graph_builder.add_node(
     "policy",
     policy_agent
 )
+graph_builder.add_node(
+    "leave_application",
+    leave_application_agent
+)
 
 graph_builder.add_edge(
     START,
@@ -55,12 +62,13 @@ graph_builder.add_conditional_edges(
     {
         "employee": "employee",
         "leave": "leave",
-        "policy": "policy"
+        "policy": "policy",
+        "leave_application": "leave_application"
     }
 )
 
 graph_builder.add_edge(
-    "policy",
+    "leave_application",
     END
 )
 

@@ -12,7 +12,6 @@ from memory.conversation_memory import (
 
 from services.rag_service import ask_rag
 
-
 from services.odoo_service import (
 
     get_employee_count,
@@ -34,14 +33,16 @@ from services.odoo_service import (
     is_employee_on_leave_today
 )
 
+from services.tool_router import (
+    select_tool
+)
 
+from graph.graph_builder import graph
 
 from services.odoo_service import (
     get_leave_types,
     get_leave_type_details
 )
-
-
 
 from services.confirmation_classifier import (
     classify_confirmation
@@ -60,15 +61,12 @@ def process_question(question: str, user_id: int = None):
     print(
         f"//////// CURRENT USER: {current_user}"
     )
+    
 
     current_employee = (
         get_employee_from_user(
             user_id
         )
-    )
-
-    print(
-        f"CURRENT EMPLOYEE: {current_employee}"
     )
 
     pending_leave = memory_store.get(
@@ -116,19 +114,53 @@ def process_question(question: str, user_id: int = None):
                 "answer":
                 "Leave request cancelled."
             }
-            
 
-        question = resolve_question(
-            question
-        )
+
+    graph_result = graph.invoke(
+        {
+            "question": question,
+            "user_id": user_id,
+            "current_employee": current_employee
+        }
+    )
+
+    if graph_result.get("response"):
+
+        return {
+            "answer":
+            graph_result["response"]
+        }
+
+    print(
+        f"CURRENT EMPLOYEE: {current_employee}"
+    )
+   
+
+    question = resolve_question(
+        question
+    )
 
     print(
         f"QUESTION AFTER RESOLUTION: [{question}]"
     )
 
-    from services.tool_router import (
-        select_tool
-    )
+
+    graph_result = graph.invoke({
+
+        "question": question,
+
+        "user_id": user_id,
+
+        "current_employee": current_employee
+    })
+
+    if graph_result.get("response"):
+
+        return {
+
+            "answer":
+            graph_result["response"]
+        }
 
 
     tool_data = select_tool(
@@ -310,16 +342,10 @@ def process_question(question: str, user_id: int = None):
 
     if intent == "leave_policy":
 
-        print(">>>>>>>> NEW POLICY AGENT EXECUTED <<<<<<<<")
-
         try:
 
             rag_response = ask_rag(
                 question
-            )
-
-            print(
-                f"RAG RESPONSE: {rag_response}"
             )
 
             return {

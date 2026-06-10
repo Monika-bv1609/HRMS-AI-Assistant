@@ -1,21 +1,18 @@
 from graph.graph_builder import graph
 
-questions = [
+result = graph.invoke({
 
-    "What is the notice period?",
+    "question":
+    "Apply leave for me tomorrow",
 
-    "Can I work from home?",
+    "user_id":
+    2,
 
-    "What is paternity leave?"
-]
+    "current_employee":
+    {
+        "id": 1,
+        "name": "Mitchell Admin"
+    }
+})
 
-for question in questions:
-
-    print("\n" + "=" * 60)
-
-    result = graph.invoke({
-
-        "question": question
-    })
-
-    print(result)
+print(result)

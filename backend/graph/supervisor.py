@@ -27,18 +27,21 @@ def supervisor(state):
             "next_agent": "leave"
         }
 
-    if tool in [
-
-        "leave_status",
-
-        "leave_application"
-
-    ]:
+    if tool == "leave_status":
 
         return {
 
             "tool_data": tool_data,
             "next_agent": "leave"
+        }
+
+
+    if tool == "leave_application":
+
+        return {
+
+            "tool_data": tool_data,
+            "next_agent": "leave_application"
         }
 
     if tool == "leave_policy":
