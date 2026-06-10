@@ -219,6 +219,51 @@ Output:
     "leave_type": "Casual Leave"
 }
 
+User:
+How many employees are there?
+
+Output:
+{
+    "tool": "employee_search",
+    "request_type": "count"
+}
+
+User:
+What is the employee count?
+
+Output:
+{
+    "tool": "employee_search",
+    "request_type": "count"
+}
+
+User:
+How many leave requests are there?
+
+Output:
+{
+    "tool": "leave_status",
+    "request_type": "count"
+}
+
+User:
+What is the total leave count?
+
+Output:
+{
+    "tool": "leave_status",
+    "request_type": "count"
+}
+
+User:
+Who is on leave today?
+
+Output:
+{
+    "tool": "leave_status",
+    "request_type": "today_list"
+}
+
 Rules:
 
 - Return ONLY JSON.

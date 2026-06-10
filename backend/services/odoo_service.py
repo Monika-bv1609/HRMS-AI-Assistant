@@ -20,6 +20,22 @@ def get_employee_count():
         [[]]
     )
 
+def get_leave_count():
+
+    uid, models = get_models()
+
+    return models.execute_kw(
+
+        DB,
+        uid,
+        PASSWORD,
+
+        "hr.leave",
+
+        "search_count",
+
+        [[]]
+    )
 
 def get_leaves_today():
 
