@@ -1,8 +1,8 @@
-# ODOOHR-AI
+# HRMS-AI-Assistant
 
 ## Overview
 
-ODOOHR-AI is an AI-powered Human Resource Assistant that integrates Odoo ERP with Large Language Models using LangGraph. The system enables employees and managers to perform HR operations through natural language conversations.
+HRMS-AI-Assistant is an AI-powered Human Resource Assistant that integrates Odoo ERP with Large Language Models using LangGraph. The system enables employees and managers to perform HR operations through natural language conversations.
 
 The application combines AI Agents, Retrieval-Augmented Generation (RAG), FastAPI, ChromaDB, and Odoo APIs to automate HR processes such as leave management, employee information retrieval, and policy assistance.
 
