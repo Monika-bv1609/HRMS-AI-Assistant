@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from odoo.client import (
     get_models,
@@ -6,6 +6,117 @@ from odoo.client import (
     PASSWORD
 )
 
+
+def resolve_date(date_value):
+
+    if not date_value:
+        return date_value
+
+    original_value = date_value.strip()
+
+    lower_value = original_value.lower()
+
+    if lower_value == "today":
+
+        return date.today().isoformat()
+
+    if lower_value == "tomorrow":
+
+        return (
+            date.today()
+            + timedelta(days=1)
+        ).isoformat()
+
+    weekdays = {
+
+        "monday": 0,
+        "tuesday": 1,
+        "wednesday": 2,
+        "thursday": 3,
+        "friday": 4,
+        "saturday": 5,
+        "sunday": 6,
+    }
+
+    if lower_value.startswith("next "):
+
+        day_name = (
+            lower_value
+            .replace("next ", "")
+            .strip()
+        )
+
+        if day_name in weekdays:
+
+            today = date.today()
+
+            target_day = weekdays[day_name]
+
+            days_ahead = (
+                target_day
+                - today.weekday()
+            )
+
+            if days_ahead <= 0:
+
+                days_ahead += 7
+
+            return (
+                today
+                + timedelta(days=days_ahead)
+            ).isoformat()
+
+    try:
+
+        return datetime.strptime(
+            original_value,
+            "%B %d %Y"
+        ).date().isoformat()
+
+    except Exception:
+        pass
+
+    try:
+
+        return datetime.strptime(
+            original_value,
+            "%d %B %Y"
+        ).date().isoformat()
+
+    except Exception:
+        pass
+
+    try:
+
+        return datetime.strptime(
+            original_value,
+            "%d/%m/%Y"
+        ).date().isoformat()
+
+    except Exception:
+        pass
+
+    try:
+
+        return datetime.strptime(
+            f"{original_value} {date.today().year}",
+            "%d %B %Y"
+        ).date().isoformat()
+
+    except Exception:
+        pass
+
+    try:
+
+        return datetime.strptime(
+            f"{original_value} {date.today().year}",
+            "%B %d %Y"
+        ).date().isoformat()
+
+    except Exception:
+        pass
+
+    return original_value
 
 def get_employee_count():
 
@@ -257,6 +368,33 @@ def create_leave_request(leave_request):
 
     try:
 
+        start_date = resolve_date(
+            leave_request["start_date"]
+        )
+
+        end_date = resolve_date(
+            leave_request["end_date"]
+        )
+
+        if start_date == "today":
+
+            start_date = date.today().isoformat()
+
+
+        if end_date == "today":
+
+            end_date = date.today().isoformat()
+
+        elif end_date == "tomorrow":
+
+            end_date = (
+                date.today() +
+                timedelta(days=1)
+            ).isoformat()
+
+        print(f"RESOLVED START DATE: {start_date}")
+        print(f"RESOLVED END DATE: {end_date}")
+
         leave_id = models.execute_kw(
 
             DB,
@@ -278,10 +416,10 @@ def create_leave_request(leave_request):
                 leave_request["leave_type_id"],
 
                 "request_date_from":
-                leave_request["start_date"],
+                start_date,
 
                 "request_date_to":
-                leave_request["end_date"],
+                end_date,
 
                 "name":
                 leave_request.get("reason")
@@ -294,13 +432,14 @@ def create_leave_request(leave_request):
             "success": True,
             "leave_id": leave_id
         }
+
     except Exception as e:
-        
+
         return {
 
-        "success": False,
-        "error": str(e)
-    }
+            "success": False,
+            "error": str(e)
+        }
 
 
 def get_user(user_id):

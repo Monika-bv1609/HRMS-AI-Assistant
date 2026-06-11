@@ -110,8 +110,8 @@ Output:
     "tool": "leave_application",
     "employee_name": null,
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-09",
-    "end_date": "2026-06-09",
+    "start_date": "tomorrow",
+    "end_date": "tomorrow",
     "reason": null
 }
 
@@ -123,8 +123,8 @@ Output:
     "tool": "leave_application",
     "employee_name": null,
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-09",
-    "end_date": "2026-06-09",
+    "start_date": "tomorrow",
+    "end_date": "tomorrow",
     "reason": null
 }
 
@@ -136,8 +136,8 @@ Output:
     "tool": "leave_application",
     "employee_name": "Rachel Perry",
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-09",
-    "end_date": "2026-06-09",
+    "start_date": "tomorrow",
+    "end_date": "tomorrow",
     "reason": null
 }
 
@@ -149,8 +149,8 @@ Output:
     "tool": "leave_application",
     "employee_name": null,
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-09",
-    "end_date": "2026-06-09",
+    "start_date": "tomorrow",
+    "end_date": "tomorrow",
     "reason": null
 }
 
@@ -162,8 +162,8 @@ Output:
     "tool": "leave_application",
     "employee_name": null,
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-09",
-    "end_date": "2026-06-09",
+    "start_date": "tomorrow",
+    "end_date": "tomorrow",
     "reason": null
 }
 
@@ -175,8 +175,8 @@ Output:
     "tool": "leave_application",
     "employee_name": "Rachel Perry",
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-09",
-    "end_date": "2026-06-09",
+    "start_date": "tomorrow",
+    "end_date": "tomorrow",
     "reason": null
 }
 
@@ -188,8 +188,8 @@ Output:
     "tool": "leave_application",
     "employee_name": "Rachel Perry",
     "leave_type": "Sick Time Off",
-    "start_date": "2026-06-09",
-    "end_date": "2026-06-09",
+    "start_date": "tomorrow",
+    "end_date": "tomorrow",
     "reason": "sick"
 }
 
@@ -272,6 +272,15 @@ Rules:
 - No markdown.
 - No code blocks.
 - No extra text.
+
+- Never generate hardcoded example dates.
+- Preserve dates exactly as provided by the user.
+- For relative dates return:
+  today
+  tomorrow
+  next Monday
+  next week
+- For explicit dates return the actual date mentioned by the user.
 """
             },
 
