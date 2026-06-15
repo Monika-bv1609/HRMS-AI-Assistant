@@ -1,122 +1,47 @@
-from datetime import date, datetime, timedelta
+import re
 
-from odoo.client import (
-    get_models,
-    DB,
-    PASSWORD
-)
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
 
+import dateparser
+
+from odoo.client import get_models, DB, PASSWORD 
 
 def resolve_date(date_value):
 
     if not date_value:
-        return date_value
+        return None
 
-    original_value = date_value.strip()
+    if isinstance(date_value, date):
+        return date_value.isoformat()
 
-    lower_value = original_value.lower()
+    original_value = str(date_value).strip()
 
-    if lower_value == "today":
+    if not original_value:
+        return None
 
-        return date.today().isoformat()
+    # Remove ordinal suffixes:
+    # 1st -> 1, 2nd -> 2, 3rd -> 3, 17th -> 17
+    cleaned_value = re.sub(
+        r"(\d+)(st|nd|rd|th)\b",
+        r"\1",
+        original_value,
+        flags=re.IGNORECASE
+    )
 
-    if lower_value == "tomorrow":
+    parsed = dateparser.parse(
+        cleaned_value,
+        settings={
+            "PREFER_DATES_FROM": "future",
+            "RELATIVE_BASE": datetime.now(),
+            "RETURN_AS_TIMEZONE_AWARE": False,
+        }
+    )
 
-        return (
-            date.today()
-            + timedelta(days=1)
-        ).isoformat()
+    if parsed:
+        return parsed.date().isoformat()
 
-    weekdays = {
-
-        "monday": 0,
-        "tuesday": 1,
-        "wednesday": 2,
-        "thursday": 3,
-        "friday": 4,
-        "saturday": 5,
-        "sunday": 6,
-    }
-
-    if lower_value.startswith("next "):
-
-        day_name = (
-            lower_value
-            .replace("next ", "")
-            .strip()
-        )
-
-        if day_name in weekdays:
-
-            today = date.today()
-
-            target_day = weekdays[day_name]
-
-            days_ahead = (
-                target_day
-                - today.weekday()
-            )
-
-            if days_ahead <= 0:
-
-                days_ahead += 7
-
-            return (
-                today
-                + timedelta(days=days_ahead)
-            ).isoformat()
-
-    try:
-
-        return datetime.strptime(
-            original_value,
-            "%B %d %Y"
-        ).date().isoformat()
-
-    except Exception:
-        pass
-
-    try:
-
-        return datetime.strptime(
-            original_value,
-            "%d %B %Y"
-        ).date().isoformat()
-
-    except Exception:
-        pass
-
-    try:
-
-        return datetime.strptime(
-            original_value,
-            "%d/%m/%Y"
-        ).date().isoformat()
-
-    except Exception:
-        pass
-
-    try:
-
-        return datetime.strptime(
-            f"{original_value} {date.today().year}",
-            "%d %B %Y"
-        ).date().isoformat()
-
-    except Exception:
-        pass
-
-    try:
-
-        return datetime.strptime(
-            f"{original_value} {date.today().year}",
-            "%B %d %Y"
-        ).date().isoformat()
-
-    except Exception:
-        pass
-
-    return original_value
+    return None
 
 def get_employee_count():
 
@@ -369,31 +294,63 @@ def create_leave_request(leave_request):
     try:
 
         start_date = resolve_date(
-            leave_request["start_date"]
+            leave_request.get("start_date")
         )
 
         end_date = resolve_date(
-            leave_request["end_date"]
+            leave_request.get("end_date")
         )
 
-        if start_date == "today":
+        if not start_date:
 
-            start_date = date.today().isoformat()
+            return {
+                "success": False,
+                "error": (
+                    f"Unable to understand start date: "
+                    f"{leave_request.get('start_date')}"
+                )
+            }
 
+        if not end_date:
 
-        if end_date == "today":
+            return {
+                "success": False,
+                "error": (
+                    f"Unable to understand end date: "
+                    f"{leave_request.get('end_date')}"
+                )
+            }
 
-            end_date = date.today().isoformat()
+        if end_date < start_date:
 
-        elif end_date == "tomorrow":
-
-            end_date = (
-                date.today() +
-                timedelta(days=1)
-            ).isoformat()
+            return {
+                "success": False,
+                "error": "End date cannot be earlier than start date."
+            }
 
         print(f"RESOLVED START DATE: {start_date}")
         print(f"RESOLVED END DATE: {end_date}")
+
+        leave_vals = {
+
+            "employee_id":
+                leave_request["employee_id"],
+
+            "holiday_status_id":
+                leave_request["leave_type_id"],
+
+            "request_date_from":
+                start_date,
+
+            "request_date_to":
+                end_date,
+
+            "name":
+                leave_request.get("reason")
+                or "AI Leave Request"
+        }
+
+        print(f"LEAVE PAYLOAD: {leave_vals}")
 
         leave_id = models.execute_kw(
 
@@ -407,29 +364,13 @@ def create_leave_request(leave_request):
 
             "create",
 
-            [[{
-
-                "employee_id":
-                leave_request["employee_id"],
-
-                "holiday_status_id":
-                leave_request["leave_type_id"],
-
-                "request_date_from":
-                start_date,
-
-                "request_date_to":
-                end_date,
-
-                "name":
-                leave_request.get("reason")
-                or "AI Leave Request"
-            }]]
+            [leave_vals]
         )
 
         return {
 
             "success": True,
+
             "leave_id": leave_id
         }
 
@@ -438,6 +379,7 @@ def create_leave_request(leave_request):
         return {
 
             "success": False,
+
             "error": str(e)
         }
 
