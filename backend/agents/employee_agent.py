@@ -3,6 +3,8 @@ from services.odoo_service import (
     get_employee_count
 )
 
+from memory.conversation_memory import memory_store
+
 
 def employee_agent(state):
 
@@ -17,7 +19,6 @@ def employee_agent(state):
         total = get_employee_count()
 
         return {
-
             "response":
             f"Total employees: {total}"
         }
@@ -29,7 +30,6 @@ def employee_agent(state):
     if not employee_name:
 
         return {
-
             "response":
             "Unable to identify employee."
         }
@@ -41,15 +41,35 @@ def employee_agent(state):
     if not employees:
 
         return {
-
             "response":
             f"Employee '{employee_name}' not found."
         }
 
     employee = employees[0]
 
-    return {
+    memory_store["employee_name"] = employee["name"]
 
+    if request_type == "email":
+
+        return {
+            "response":
+            employee.get("work_email")
+            or "Email not available."
+        }
+
+    if request_type in [
+        "designation",
+        "job_title",
+        "role"
+    ]:
+
+        return {
+            "response":
+            employee.get("job_title")
+            or "Designation not available."
+        }
+
+    return {
         "response":
         f"{employee['name']} | "
         f"{employee.get('job_title')} | "
