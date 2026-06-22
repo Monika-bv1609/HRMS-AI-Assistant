@@ -25,6 +25,9 @@ from services.confirmation_classifier import (
     classify_confirmation
 )
 
+from langsmith import traceable
+
+@traceable(name="process_hr_question")
 def process_question(question: str, user_id: int = None):
 
     print("=" * 50)
@@ -96,20 +99,30 @@ def process_question(question: str, user_id: int = None):
         f"QUESTION AFTER RESOLUTION: [{question}]"
     )
 
-    graph_result = graph.invoke({
-
-        "question": question,
-
-        "user_id": user_id,
-
-        "current_employee": current_employee
-    })
+    graph_result = graph.invoke(
+        {
+            "question": question,
+            "user_id": user_id,
+            "current_employee": current_employee
+        },
+        config={
+            "run_name": "hr_chat_request",
+            "metadata": {
+                "user_id": user_id,
+                "employee_id": current_employee.get("id") if current_employee else None
+            },
+            "configurable": {
+                "thread_id": str(user_id)
+            }
+        }
+    )
 
     return {
-
-        "answer":
-        graph_result.get(
+        "answer": graph_result.get(
             "response",
             "Unable to process request."
+        ),
+        "agent": graph_result.get(
+            "next_agent"
         )
     }

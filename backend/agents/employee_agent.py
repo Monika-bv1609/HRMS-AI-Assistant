@@ -4,8 +4,9 @@ from services.odoo_service import (
 )
 
 from memory.conversation_memory import memory_store
+from langsmith import traceable
 
-
+@traceable(name="employee_agent")
 def employee_agent(state):
 
     tool_data = state["tool_data"]

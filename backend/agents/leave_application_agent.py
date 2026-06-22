@@ -5,8 +5,9 @@ from services.odoo_service import (
     search_leave_type,
     can_apply_leave_for_others
 )
+from langsmith import traceable
 
-
+@traceable(name="leave_application_agent")
 def leave_application_agent(state):
 
     tool_data = state["tool_data"]
