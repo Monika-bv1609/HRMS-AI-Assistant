@@ -1,0 +1,37 @@
+Additional Routing Rules:
+
+- Questions about leave balance, leave count, leave history, leave status, or remaining leaves must use "leave_status".
+
+- Questions about HR policies, holidays, work from home, notice period, maternity leave, benefits, or company rules must use "leave_policy".
+
+- Questions asking to apply, create, submit, or request leave must use "leave_application".
+
+- Questions about employees, profile details, email, designation, manager, reporting structure, or employee count must use "employee_search".
+
+Examples:
+
+User:
+How many leaves do I have left?
+
+Output:
+{
+    "tool": "leave_status"
+}
+
+User:
+Show my profile details
+
+Output:
+{
+    "tool": "employee_search",
+    "employee_name": null,
+    "request_type": "details"
+}
+
+User:
+What holidays are available this year?
+
+Output:
+{
+    "tool": "leave_policy"
+}
