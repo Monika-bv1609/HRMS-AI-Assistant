@@ -7,6 +7,9 @@ import dateparser
 
 from odoo.client import get_models, DB, PASSWORD 
 
+from langsmith import traceable
+
+@traceable(name="resolve_date")
 def resolve_date(date_value):
 
     if not date_value:
@@ -43,6 +46,7 @@ def resolve_date(date_value):
 
     return None
 
+@traceable(name="get_employee_count")
 def get_employee_count():
 
     uid, models = get_models()
@@ -56,6 +60,7 @@ def get_employee_count():
         [[]]
     )
 
+@traceable(name="get_leave_count")
 def get_leave_count():
 
     uid, models = get_models()
@@ -73,6 +78,7 @@ def get_leave_count():
         [[]]
     )
 
+@traceable(name="get_leaves_today")
 def get_leaves_today():
 
     uid, models = get_models()
@@ -99,6 +105,7 @@ def get_leaves_today():
     )
 
 
+@traceable(name="search_employee")
 def search_employee(name):
 
     uid, models = get_models()
@@ -122,6 +129,7 @@ def search_employee(name):
     )
 
 
+@traceable(name="get_leave_count_today")
 def get_leave_count_today():
 
     leaves = get_leaves_today()
@@ -130,6 +138,7 @@ def get_leave_count_today():
 
 
 
+@traceable(name="is_employee_on_leave_today")
 def is_employee_on_leave_today(
     employee_name
 ):
@@ -153,6 +162,7 @@ def is_employee_on_leave_today(
     return False
 
 
+@traceable(name="get_leave_types")
 def get_leave_types():
 
     uid, models = get_models()
@@ -198,6 +208,7 @@ def get_leave_types():
     return leave_types
 
 
+@traceable(name="get_leave_type_details")
 def get_leave_type_details(
     leave_type_name
 ):
@@ -223,6 +234,7 @@ def get_leave_type_details(
     return None
 
 
+@traceable(name="create_test_leave")
 def create_test_leave():
 
     uid, models = get_models()
@@ -253,6 +265,7 @@ def create_test_leave():
 
 
 
+@traceable(name="search_leave_type")
 def search_leave_type(leave_type_name):
 
     uid, models = get_models()
@@ -287,6 +300,7 @@ def search_leave_type(leave_type_name):
     return leave_types
 
 
+@traceable(name="create_leave_request")
 def create_leave_request(leave_request):
 
     uid, models = get_models()
@@ -384,6 +398,7 @@ def create_leave_request(leave_request):
         }
 
 
+@traceable(name="get_user")
 def get_user(user_id):
 
     uid, models = get_models()
@@ -413,6 +428,7 @@ def get_user(user_id):
     return users[0] if users else None
 
 
+@traceable(name="get_employee_from_user")
 def get_employee_from_user(
     user_id
 ):
@@ -455,6 +471,7 @@ def get_employee_from_user(
     )
 
 
+@traceable(name="get_user_group_xmlids")
 def get_user_group_xmlids(user_id):
 
     uid, models = get_models()
@@ -526,6 +543,7 @@ def get_user_group_xmlids(user_id):
     return result
 
 
+@traceable(name="can_apply_leave_for_others")
 def can_apply_leave_for_others(user_id):
 
     xml_ids = get_user_group_xmlids(

@@ -1,6 +1,7 @@
 from services.tool_router import select_tool
+from langsmith import traceable
 
-
+@traceable(name="supervisor")
 def supervisor(state):
 
     question = state["question"]

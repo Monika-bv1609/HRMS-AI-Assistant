@@ -1,8 +1,9 @@
 import requests
 
 from utils.config import PDF_AGENT_URL
+from langsmith import traceable
 
-
+@traceable(name="upload_multiple_pdfs_to_rag")
 def upload_multiple_pdfs_to_rag(files):
 
     uploaded_files = []

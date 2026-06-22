@@ -4,7 +4,9 @@ from services.odoo_service import (
     get_leaves_today
 )
 
+from langsmith import traceable
 
+@traceable(name="leave_agent")
 def leave_agent(state):
 
     tool_data = state["tool_data"]

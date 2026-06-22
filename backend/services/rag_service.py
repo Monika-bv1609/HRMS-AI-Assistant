@@ -1,8 +1,9 @@
 import requests
 
 from utils.config import PDF_AGENT_URL
+from langsmith import traceable
 
-
+@traceable(name="ask_rag")
 def ask_rag(question):
 
     response = requests.post(

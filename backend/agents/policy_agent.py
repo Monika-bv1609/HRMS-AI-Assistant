@@ -1,8 +1,9 @@
 from services.rag_service import (
     ask_rag
 )
+from langsmith import traceable
 
-
+@traceable(name="policy_agent")
 def policy_agent(state):
     print(">>>>>>>> NEW POLICY AGENT EXECUTED <<<<<<<<")
 
