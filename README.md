@@ -121,6 +121,27 @@ backend/
 * Employee Onboarding Agent
 * Performance Review Agent
 
+
+LangSmith Observability & Evaluation
+
+Implemented LangSmith for monitoring, debugging, and evaluating the AI system.
+
+Features
+Prompt Versioning
+Dataset Creation
+Experiment Tracking
+Tool Router Evaluation
+LLM-as-a-Judge Evaluation
+RAG Evaluation
+Groundedness Analysis
+Retrieval Relevance Analysis
+Correctness Evaluation
+Tracing & Debugging
+
+
+<img width="1887" height="860" alt="image" src="https://github.com/user-attachments/assets/da33ee27-a9b0-4976-b4ed-07d71199a8e3" />
+
+
 ---
 
 ## Author
