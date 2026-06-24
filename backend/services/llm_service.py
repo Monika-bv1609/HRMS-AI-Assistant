@@ -10,100 +10,62 @@ client = OpenAI(
 )
 
 
-# def classify_intent(question):
+from services.llm_service import client
 
-#     response = client.chat.completions.create(
+def classify_policy(question):
 
-#         model="llama-3.1-8b-instant",
+    response = client.chat.completions.create(
 
-#         messages=[
+        model="llama-3.1-8b-instant",
 
-#             {
-#                 "role": "system",
-#                 "content": """
-#             You are an intent classifier.
+        messages=[
+            {
+                "role": "system",
+                "content": """
+You are a classifier.
 
-#             Return ONLY one of:
+Return ONLY one word:
 
-#             employee_count
-#             employee_search
-#             leave_today
-#             leave_count
-#             leave_status
-#             leave_policy
-#             leave_application
+leave
+travel
+insurance
+wfh
 
-#             Examples:
+Examples:
 
-#             How many employees are there?
-#             -> employee_count
+Question: What is maternity leave policy?
+Answer: leave
 
-#             Find employee Mitchell
-#             -> employee_search
+Question: Can I claim travel reimbursement?
+Answer: travel
 
-#             Who is on leave today?
-#             -> leave_today
+Question: What insurance benefits do I have?
+Answer: insurance
 
-#             How many employees are on leave today?
-#             -> leave_count
+Question: Can I work from home?
+Answer: wfh
 
-#             Is Mitchell on leave today?
-#             -> leave_status
+Return ONLY the category.
+"""
+            },
+            {
+                "role": "user",
+                "content": question
+            }
+        ],
 
-#             Is he on leave today?
-#             -> leave_status
+        temperature=0
+    )
 
-#             Rules:
-#             - Return only the intent
-#             - No explanation
-#             - No JSON
-#             - No code
-#             """
-#             },
+    category = (
+        response
+        .choices[0]
+        .message
+        .content
+        .strip()
+        .lower()
+    )
 
-#             {
-#                 "role": "user",
-#                 "content": question
-#             }
+    print(f"[POLICY CLASSIFIER] Category = {category}")
 
-#         ],
-
-#         temperature=0
-#     )
-
-#     intent = (
-
-#         response
-#         .choices[0]
-#         .message
-#         .content
-#         .strip()
-#         .lower()
-#     )
-
-#     print(
-#         f"RAW LLM RESPONSE: [{intent}]"
-#     )
-
-#     if "employee_search" in intent:
-#         return "employee_search"
-
-#     if "employee_count" in intent:
-#         return "employee_count"
-
-#     if "leave_today" in intent:
-#         return "leave_today"
-
-#     if "leave_count" in intent:
-#         return "leave_count"
-
-#     if "leave_status" in intent:
-#         return "leave_status"
-    
-#     if "leave_policy" in intent:
-#         return "leave_policy"
-    
-#     if "leave_application" in intent:
-#         return "leave_application"
-
-#     return "unknown"
+    return category
