@@ -1,6 +1,10 @@
 from services.rag_service import (
     ask_rag
 )
+from services.policy_classifier import (
+    classify_policy
+)
+
 from langsmith import traceable
 
 @traceable(name="policy_agent")
@@ -11,8 +15,11 @@ def policy_agent(state):
 
     try:
 
+        policy_type = classify_policy(question)
+        print(f"0000000 [POLICY CLASSIFIER] Category = {policy_type}")
+
         rag_response = ask_rag(
-            question
+            question,policy_type
         )
 
         return {
